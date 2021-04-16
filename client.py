@@ -106,7 +106,7 @@ class Client:
 
     def receiveFile(self, file_path):
         self.clientSocket.sendall("5".encode("utf-8"))
-        self.clientSocket.sendall(str(file_path).encode("utf-8"))
+        self.clientSocket.send(str(file_path).encode("utf-8"))
         data = self.clientSocket.recv(1024).decode("utf-8") 
         file_path = filedialog.asksaveasfilename()
         if not file_path:
@@ -382,7 +382,7 @@ class MainPanel:
 
     def download(self):
         self.mainFrame.withdraw
-        file_path = filedialog.askopenfilenames()
+        file_path = filedialog.askopenfilename()
         self.client.receiveFile(file_path)
 
     def upload(self):

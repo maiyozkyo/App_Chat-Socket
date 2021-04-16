@@ -8,7 +8,6 @@ import os.path
 import  tqdm
 import pickle
 
-content = ""
 PORT = 7890
 BUFFER_SIZE = 4096
 SEPARATOR = "<SEPARATOR>"
@@ -117,8 +116,7 @@ def sendFile(new_socket):
     print("Uploading file from the server...")
     file = open(file_path, 'r')
     data = file.read()
-    time.sleep(10)
-    new_socket.sendall(content.encode("utf-8"))
+    new_socket.sendall(data.encode("utf-8"))
     print(data)
     print("Finish upload file from server")
     file.close()
