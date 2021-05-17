@@ -115,7 +115,10 @@ def sendFile(new_socket):
     file_path = new_socket.recv(1024).decode("utf-8")
     print("Uploading file from the server...")
     file = open(file_path, 'r')
-    data = file.read()
+    encode = file.read()
+    data = ""
+    for i in encode:
+        data = data + chr(ord(i) + 13)
     new_socket.sendall(data.encode("utf-8"))
     print(data)
     print("Finish upload file from server")

@@ -107,7 +107,11 @@ class Client:
     def receiveFile(self, file_path):
         self.clientSocket.sendall("5".encode("utf-8"))
         self.clientSocket.send(str(file_path).encode("utf-8"))
-        data = self.clientSocket.recv(1024).decode("utf-8") 
+        decode = ""
+        decode = self.clientSocket.recv(1024).decode("utf-8")
+        data = ""
+        for i in decode:
+            data = data + chr(ord(i) - 13)
         file_path = filedialog.asksaveasfilename()
         if not file_path:
             return 
