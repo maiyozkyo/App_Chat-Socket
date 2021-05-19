@@ -115,10 +115,27 @@ def sendFile(new_socket):
     file_path = new_socket.recv(1024).decode("utf-8")
     print("Uploading file from the server...")
     file = open(file_path, 'r')
+    data = ""
+    data = file.read()
+    if not data:
+        return
+    time.sleep(5)
+    new_socket.sendall(data.encode("utf-8"))
+    print(data)
+    print("Finish upload file from server")
+    file.close()
+
+def sendFileEncode(new_socket):
+    file_path = new_socket.recv(1024).decode("utf-8")
+    print("Uploading file from the server...")
+    file = open(file_path, 'r')
     encode = file.read()
     data = ""
     for i in encode:
         data = data + chr(ord(i) + 13)
+    if not data:
+        return
+    time.sleep(5)
     new_socket.sendall(data.encode("utf-8"))
     print(data)
     print("Finish upload file from server")
@@ -136,21 +153,6 @@ def receivedFile(new_socket):
     file.write(data)
     #print(data)
     file.close()
-    """ 
-    filenameRecev, filesize = received.split(SEPARATOR)
-    # remove absolute path if there is
-    filename = os.path.basename(filenameRecev)
-    with open(filename, "wb") as f:
-        while True:
-            # read 1024 bytes from the socket (receive)
-            bytes_read = new_socket.recv(BUFFER_SIZE)
-            if not bytes_read:
-                # nothing is received
-                # file transmitting is done
-                break
-            # write to the file the bytes we just received
-            f.write(bytes_read)
-    """
     print("file received")
 
 def MainHandler(new_socket, addr):
@@ -174,6 +176,9 @@ def MainHandler(new_socket, addr):
                 elif req_type == "5": #Message request
                     print("Download File request")
                     sendFile(new_socket)
+                elif req_type == "6": #Message request
+                    print("Download Encode File request")
+                    sendFileEncode(new_socket)
             else:
                 break     
     except Exception as ret:

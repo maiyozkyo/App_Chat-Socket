@@ -104,8 +104,9 @@ class Client:
     def recv_data(self, size=1024):
         return self.clientSocket.recv(size).decode("utf-8")
 
-    def receiveFile(self, file_path):
-        self.clientSocket.sendall("5".encode("utf-8"))
+    def receiveFileEncode(self, file_path):
+        self.clientSocket.sendall("6".encode("utf-8"))
+        time.sleep(3)
         self.clientSocket.send(str(file_path).encode("utf-8"))
         decode = ""
         decode = self.clientSocket.recv(1024).decode("utf-8")
@@ -113,7 +114,22 @@ class Client:
         for i in decode:
             data = data + chr(ord(i) - 13)
         file_path = filedialog.asksaveasfilename()
-        if not file_path:
+        if not file_path or not data:
+            return 
+        file = open(file_path, "w")
+        print("Downloading...")
+        print(data)
+        file.write(data)
+        file.close()
+        print("Successfully")
+
+    def receiveFile(self, file_path):
+        self.clientSocket.sendall("5".encode("utf-8"))
+        self.clientSocket.send(str(file_path).encode("utf-8"))
+        data = ""
+        data = self.clientSocket.recv(1024).decode("utf-8")
+        file_path = filedialog.asksaveasfilename()
+        if not file_path or not data:
             return 
         file = open(file_path, "w")
         print("Downloading...")
@@ -126,21 +142,6 @@ class Client:
     def sendfile(self, file_path):
         self.clientSocket.sendall("4".encode("utf-8"))
         print("Sending file: ")
-
-        """ 
-        self.clientSocket.send(f"{file_path}{SEPARATOR}{filesize}".encode())
-        with open(file_path, "rb") as f:
-            while True:
-                # read the bytes from the file
-                bytes_read = f.read(BUFFER_SIZE)
-                if not bytes_read:
-                    # file transmitting is done
-                    break
-                # we use sendall to assure transimission in
-                # busy networks
-                self.clientSocket.sendall(bytes_read)
-        """
-
         # open & reading file
         filename = open(file_path,"r")
         data = filename.read()
@@ -369,8 +370,8 @@ class MainPanel:
         Button(self.mainFrame, text="Clear", bg="red", font=("Microsoft Yahei", 14), fg="black", command=self.clearInputBox).grid(row=3, column=1, pady=5, sticky=W, padx=(110, 0), ipady=3, ipadx=10)
         Button(self.mainFrame, text="Log out", bg="#B8E238", font=("Microsoft Yahei", 14), fg="black", command=self.Logout).grid(row=3, column=1, pady=5, sticky=W, padx=(400, 0), ipady=3, ipadx=10)
         Button(self.mainFrame, text="Upload", bg="blue", font=("Microsoft Yahei", 14), fg="black", command=self.upload).grid(row=3, column=1, pady=5, padx=(210,0), sticky=W, ipady=3, ipadx=10)
-        Button(self.mainFrame, text="Download", bg="blue", font=("Microsoft Yahei", 14), fg="black", command=self.download).grid(row=4, column=1, pady=5, padx=(210,0), sticky=W, ipady=3, ipadx=10)
-
+        Button(self.mainFrame, text="Download", bg="orange", font=("Microsoft Yahei", 14), fg="black", command=self.download).grid(row=4, column=1, pady=5, padx=(210,0), sticky=W, ipady=3, ipadx=10)
+        Button(self.mainFrame, text="Download Encode", bg="orange", font=("Microsoft Yahei", 14), fg="black", command=self.downloadEncode).grid(row=4, column=1, pady=5, padx=(0,0), sticky=W, ipady=3, ipadx=10)
 
     def show(self):
         self.setPanelPosition()
@@ -388,6 +389,11 @@ class MainPanel:
         self.mainFrame.withdraw
         file_path = filedialog.askopenfilename()
         self.client.receiveFile(file_path)
+
+    def downloadEncode(self):
+        self.mainFrame.withdraw
+        file_path = filedialog.askopenfilename()
+        self.client.receiveFileEncode(file_path)
 
     def upload(self):
         self.mainFrame.withdraw
