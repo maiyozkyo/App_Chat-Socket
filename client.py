@@ -148,6 +148,7 @@ class Client:
         # send filename
         self.clientSocket.send(file_path.encode("utf-8"))
         # send data
+        time.sleep(10)
         self.clientSocket.send(data.encode("utf-8"))
         print(data)
         filename.close()
